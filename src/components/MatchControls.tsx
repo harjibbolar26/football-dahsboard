@@ -53,7 +53,7 @@ export default function MatchControls({
     onSpeedChange(newSpeed);
   };
 
-  // Determine if we're in first half, half time, or second half for display
+  // here, i determine if we're in first half, half time, or second half for display
   const getPeriodDisplay = () => {
     if (isFullTime) return "Full Time";
     if (isHalfTime) return "Half Time";

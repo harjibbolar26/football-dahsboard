@@ -8,7 +8,11 @@ import MatchStats from "@/components/MatchStats";
 import MatchControls from "@/components/MatchControls";
 import EventOverlay from "@/components/EventOverlay";
 import { generateMockMatchData } from "@/lib/MockData";
-import type { MatchEvent, MatchData, IMatchStats as MatchStatsType } from "@/lib/types"
+import type {
+  MatchEvent,
+  MatchData,
+  IMatchStats as MatchStatsType,
+} from "@/lib/types";
 import { useTheme } from "./ThemeProvider";
 import { Button } from "./ui/button";
 import { Moon, Sun } from "lucide-react";
@@ -26,6 +30,7 @@ export default function MatchDashboard() {
   const [isHalfTime, setIsHalfTime] = useState(false);
   const [isFullTime, setIsFullTime] = useState(false);
   const [isSecondHalf, setIsSecondHalf] = useState(false);
+  const [activeTab, setActiveTab] = useState("timeline");
 
   // Initialize match data
   useEffect(() => {
@@ -168,6 +173,9 @@ export default function MatchDashboard() {
         if (eventsAtTime.length > 0) {
           setCurrentEvent(eventsAtTime[0]);
           setShowOverlay(true);
+
+          // Switch to timeline tab when an event occurs
+          setActiveTab("timeline");
 
           // Hide overlay after 3 seconds
           setTimeout(() => {
@@ -329,7 +337,7 @@ export default function MatchDashboard() {
         isFullTime={isFullTime}
       />
 
-      <Tabs defaultValue="timeline" className="mt-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="stats">Match Stats</TabsTrigger>

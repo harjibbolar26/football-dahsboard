@@ -17,22 +17,22 @@ export default function EventOverlay({ event }: EventOverlayProps) {
   const getEventIcon = () => {
     switch (event.type) {
       case "goal":
-        return <Goal className="w-8 h-8" />;
+        return <Goal className="sm:w-8 sm:h-8 w-4 h-4" />;
       case "yellowCard":
-        return <Card className="w-8 h-8 text-yellow-500 fill-yellow-500" />;
+        return <Card className="sm:w-8 sm:h-8 w-4 h-4 text-yellow-500 fill-yellow-500" />;
       case "redCard":
-        return <Card className="w-8 h-8 text-red-500 fill-red-500" />;
+        return <Card className="sm:w-8 sm:h-8 w-4 h-4 text-red-500 fill-red-500" />;
       case "substitution":
         return (
-          <div className="flex flex-col">
-            <UserPlus className="w-6 h-6 text-green-500" />
-            <UserMinus className="w-6 h-6 text-red-500 -mt-1" />
+          <div className="flex sm:flex-col flex-row max-sm:items-center gap-1">
+            <UserPlus className="sm:w-6 sm:h-6 w-3 h-3 text-green-500" />
+            <UserMinus className="sm:w-6 sm:h-6 w-3 h-3 text-red-500 -mt-1" />
           </div>
         );
       case "foul":
-        return <AlertTriangle className="w-8 h-8 text-yellow-500" />;
+        return <AlertTriangle className="sm:w-8 sm:h-8 w-4 h-4 text-yellow-500" />;
       default:
-        return <Whistle className="w-8 h-8" />;
+        return <Whistle className="sm:w-8 sm:h-8 w-4 h-4" />;
     }
   };
 
@@ -57,14 +57,14 @@ export default function EventOverlay({ event }: EventOverlayProps) {
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
       <div
         className={cn(
-          "flex items-center gap-4 px-6 py-4 rounded-lg shadow-lg",
+          "flex sm:flex-row flex-col items-center sm:gap-4 gap-3 px-6 py-4 rounded-lg shadow-lg",
           "bg-white dark:bg-gray-800",
           "animate-bounce-in"
         )}
       >
         <div
           className={cn(
-            "w-14 h-14 rounded-full flex items-center justify-center",
+            "sm:w-14 w-10 sm:h-14 h-10 rounded-full flex items-center justify-center",
             getEventColor()
           )}
         >
@@ -72,8 +72,10 @@ export default function EventOverlay({ event }: EventOverlayProps) {
         </div>
 
         <div>
-          <div className="text-lg font-bold">{event.description}</div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="sm:text-lg text-base font-bold">
+            {event.description}
+          </div>
+          <div className="sm:text-sm text-xs text-gray-500 dark:text-gray-400">
             {event.playerName} • {Math.floor(event.time)}&apos;
           </div>
         </div>
