@@ -2,7 +2,7 @@
 
 A dynamic, interactive web application that visualizes football matches in real-time, showing player movements, ball position, match events, and statistics.
 
-![Football Match Visualization Dashboard](/placeholder.svg?height=400&width=800)
+![Football Match Visualization Dashboard](https://github.com/user-attachments/assets/1d1dc022-d66c-4fa0-b59b-dfeafeffaa48)
 
 ## 📋 Table of Contents
 
@@ -56,8 +56,8 @@ The dashboard currently uses simulated data but is designed to be easily integra
 
 1. Clone the repository:
    \`\`\`bash
-   git clone https://github.com/yourusername/football-match-visualization.git
-   cd football-match-visualization
+   git clone https://github.com/harjibbolar26/football-dahsboard.git
+   cd football-dashboard
    \`\`\`
 
 2. Install dependencies:
@@ -164,13 +164,13 @@ To integrate with real data sources:
 
 1. Create a new data fetching service in `lib/services/`
 2. Implement data transformation to match the expected types in `lib/types.ts`
-3. Replace the mock data initialization in `match-dashboard.tsx`
+3. Replace the mock data initialization in `MatchDashboard.tsx`
 
 ### Modifying Teams
 
 To change teams and players:
 
-1. Edit the `generateMockMatchData` function in `lib/mock-data.ts`
+1. Edit the `generateMockMatchData` function in `lib/MockData.ts`
 2. Update team information, player rosters, and events
 
 ### Styling
