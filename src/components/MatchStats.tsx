@@ -7,6 +7,12 @@ interface MatchStatsProps {
   stats: MatchStatsType;
 }
 
+interface MatchStatsProps {
+  homeTeam: Team;
+  awayTeam: Team;
+  stats: MatchStatsType;
+}
+
 export default function MatchStats({
   homeTeam,
   awayTeam,

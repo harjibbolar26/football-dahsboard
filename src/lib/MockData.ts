@@ -7,7 +7,7 @@ function generatePlayerPositions(
   position: string
 ): { x: number; y: number }[] {
   const positions: { x: number; y: number }[] = [];
-  const numPositions = 90; // 90 minutes / 1
+  const numPositions = 180; // 90 minutes / 0.5 = 180 position updates (every 30 seconds)
 
   // Set initial position based on player role and team
   let baseX = isHomeTeam ? 30 : 70;
@@ -82,7 +82,7 @@ function generateBallPositions(
   events: MatchEvent[]
 ): { x: number; y: number }[] {
   const positions: { x: number; y: number }[] = [];
-  const numPositions = 90; // 90 minutes / 1
+  const numPositions = 180; // 90 minutes / 0.5 = 180 position updates (every 30 seconds)
 
   // Start in the center
   let currentX = 50;
@@ -456,6 +456,7 @@ export function generateMockMatchData(): MatchData {
     player.positions = generatePlayerPositions(false, player.position);
   });
 
+  // Generate match stats - Arsenal winning 4-2
   const stats = {
     possession: { home: 55, away: 45 },
     shots: { home: 12, away: 15 },

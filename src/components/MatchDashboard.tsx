@@ -8,17 +8,26 @@ import MatchStats from "@/components/MatchStats";
 import MatchControls from "@/components/MatchControls";
 import EventOverlay from "@/components/EventOverlay";
 import { generateMockMatchData } from "@/lib/MockData";
-import type { MatchEvent, MatchData, IMatchStats } from "@/lib/types";
+import type { MatchEvent, MatchData, IMatchStats as MatchStatsType } from "@/lib/types"
+import { useTheme } from "./ThemeProvider";
+import { Button } from "./ui/button";
+import { Moon, Sun } from "lucide-react";
+import MatchStatusOverlay from "./MatchStatusOverlay";
 
 export default function MatchDashboard() {
+  const { setTheme, theme } = useTheme();
   const [matchData, setMatchData] = useState<MatchData | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [currentEvent, setCurrentEvent] = useState<MatchEvent | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
-  const [currentStats, setCurrentStats] = useState<IMatchStats | null>(null);
+  const [currentStats, setCurrentStats] = useState<MatchStatsType | null>(null);
+  const [isHalfTime, setIsHalfTime] = useState(false);
+  const [isFullTime, setIsFullTime] = useState(false);
+  const [isSecondHalf, setIsSecondHalf] = useState(false);
 
+  // Initialize match data
   useEffect(() => {
     const data = generateMockMatchData();
     setMatchData(data);
@@ -121,6 +130,21 @@ export default function MatchDashboard() {
     setCurrentStats(updatedStats);
   }, [currentTime, matchData]);
 
+  // Check for half time and full time
+  useEffect(() => {
+    // Half time check
+    if (currentTime >= 45 && currentTime < 46 && !isHalfTime && !isSecondHalf) {
+      setIsHalfTime(true);
+      setIsPlaying(false);
+    }
+
+    // Full time check
+    if (currentTime >= 90 && !isFullTime) {
+      setIsFullTime(true);
+      setIsPlaying(false);
+    }
+  }, [currentTime, isHalfTime, isSecondHalf, isFullTime]);
+
   // Simulate real-time updates
   useEffect(() => {
     if (!isPlaying || !matchData) return;
@@ -132,6 +156,7 @@ export default function MatchDashboard() {
         // Check if we've reached the end of the match
         if (newTime >= 90) {
           setIsPlaying(false);
+          setIsFullTime(true);
           return 90;
         }
 
@@ -168,10 +193,19 @@ export default function MatchDashboard() {
         player.positions.length - 1
       );
 
+      // Get base position
+      let x = player.positions[positionIndex].x;
+      const y = player.positions[positionIndex].y;
+
+      // If second half, flip the x-coordinates to switch sides
+      if (isSecondHalf) {
+        x = 100 - x;
+      }
+
       return {
         ...player,
-        x: player.positions[positionIndex].x,
-        y: player.positions[positionIndex].y,
+        x,
+        y,
       };
     });
   };
@@ -186,7 +220,24 @@ export default function MatchDashboard() {
       matchData.ballPositions.length - 1
     );
 
-    return matchData.ballPositions[positionIndex];
+    // Get base position
+    let x = matchData.ballPositions[positionIndex].x;
+    const y = matchData.ballPositions[positionIndex].y;
+
+    // If second half, flip the x-coordinates to switch sides
+    if (isSecondHalf) {
+      x = 100 - x;
+    }
+
+    return { x, y };
+  };
+
+  // Handle continuing to second half
+  const handleContinueToSecondHalf = () => {
+    setIsHalfTime(false);
+    setIsSecondHalf(true);
+    setCurrentTime(45);
+    setIsPlaying(true);
   };
 
   if (!matchData || !currentStats) {
@@ -199,11 +250,25 @@ export default function MatchDashboard() {
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-center">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold">
           {matchData.homeTeam.name} vs {matchData.awayTeam.name}
         </h1>
-        <p className="text-center text-gray-500 dark:text-gray-400">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? (
+            <Sun className="h-5 w-5" />
+          ) : (
+            <Moon className="h-5 w-5" />
+          )}
+        </Button>
+      </div>
+
+      <div className="text-center mb-6">
+        <p className="text-gray-500 dark:text-gray-400">
           Live Match Visualization
         </p>
         <div className="text-center text-xl font-bold mt-2">
@@ -217,9 +282,39 @@ export default function MatchDashboard() {
           ballPosition={getCurrentBallPosition()}
           homeTeam={matchData.homeTeam}
           awayTeam={matchData.awayTeam}
+          isSecondHalf={isSecondHalf}
         />
 
         {showOverlay && currentEvent && <EventOverlay event={currentEvent} />}
+
+        {isHalfTime && (
+          <MatchStatusOverlay
+            title="HALF TIME"
+            homeScore={currentStats.score.home}
+            awayScore={currentStats.score.away}
+            homeTeam={matchData.homeTeam.name}
+            awayTeam={matchData.awayTeam.name}
+            onContinue={handleContinueToSecondHalf}
+            buttonText="Start Second Half"
+          />
+        )}
+
+        {isFullTime && (
+          <MatchStatusOverlay
+            title="FULL TIME"
+            homeScore={currentStats.score.home}
+            awayScore={currentStats.score.away}
+            homeTeam={matchData.homeTeam.name}
+            awayTeam={matchData.awayTeam.name}
+            winner={
+              currentStats.score.home > currentStats.score.away
+                ? matchData.homeTeam.name
+                : currentStats.score.away > currentStats.score.home
+                ? matchData.awayTeam.name
+                : null
+            }
+          />
+        )}
       </div>
 
       <MatchControls
@@ -230,6 +325,8 @@ export default function MatchDashboard() {
         onPlayPause={() => setIsPlaying(!isPlaying)}
         onSpeedChange={setPlaybackSpeed}
         maxTime={90}
+        isHalfTime={isHalfTime}
+        isFullTime={isFullTime}
       />
 
       <Tabs defaultValue="timeline" className="mt-6">
@@ -244,6 +341,11 @@ export default function MatchDashboard() {
             onEventClick={(time) => {
               setCurrentTime(time);
               setIsPlaying(false);
+              // If we're jumping to second half
+              if (time >= 45 && !isSecondHalf) {
+                setIsSecondHalf(true);
+                setIsHalfTime(false);
+              }
             }}
           />
         </TabsContent>
